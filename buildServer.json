@@ -1,0 +1,19 @@
+{
+	"name": "xcode build server",
+	"version": "0.2",
+	"bspVersion": "2.0",
+	"languages": [
+		"c",
+		"cpp",
+		"objective-c",
+		"objective-cpp",
+		"swift"
+	],
+	"argv": [
+		"/opt/homebrew/bin/xcode-build-server"
+	],
+	"workspace": "/Users/trinity/Downloads/Luna/Luna.xcodeproj/project.xcworkspace",
+	"build_root": "/Users/trinity/Library/Developer/Xcode/DerivedData/Luna-glbvusrvqakkgtgbqzviazzqxjzf",
+	"scheme": "Luna",
+	"kind": "xcode"
+}
