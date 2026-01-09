@@ -597,3 +597,33 @@ struct TMDBImage: Codable {
     }
 }
 
+// MARK: - Credits Models - TrinityHades
+struct TMDBCreditsResponse: Codable {
+    let id: Int
+    let cast: [TMDBCastMember]
+    let crew: [TMDBCastMember]
+}
+
+struct TMDBCastMember: Codable, Identifiable {
+    let id: Int
+    let name: String
+    let profilePath: String?
+
+    // Cast-only
+    let character: String?
+
+    // Crew-only
+    let job: String?
+    let department: String?
+
+    enum CodingKeys: String, CodingKey {
+        case id, name, character, job, department
+        case profilePath = "profile_path"
+    }
+
+    var fullProfileURL: String? {
+        guard let profilePath else { return nil }
+        return "\(TMDBService.tmdbImageBaseURL)\(profilePath)"
+    }
+}
+
