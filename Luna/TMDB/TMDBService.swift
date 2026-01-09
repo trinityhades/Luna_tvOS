@@ -373,6 +373,38 @@ class TMDBService: ObservableObject {
         }
         return logos.first
     }
+
+    // MARK: - Get TV Show Credits
+    func getTVShowCredits(id: Int) async throws -> TMDBCreditsResponse {
+        let urlString = "\(baseURL)/tv/\(id)/credits?api_key=\(apiKey)&language=\(currentLanguage)"
+
+        guard let url = URL(string: urlString) else {
+            throw TMDBError.invalidURL
+        }
+
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
+            return try JSONDecoder().decode(TMDBCreditsResponse.self, from: data)
+        } catch {
+            throw TMDBError.networkError(error)
+        }
+    }
+
+    // MARK: - Get Movie Credits
+    func getMovieCredits(id: Int) async throws -> TMDBCreditsResponse {
+        let urlString = "\(baseURL)/movie/\(id)/credits?api_key=\(apiKey)&language=\(currentLanguage)"
+
+        guard let url = URL(string: urlString) else {
+            throw TMDBError.invalidURL
+        }
+
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
+            return try JSONDecoder().decode(TMDBCreditsResponse.self, from: data)
+        } catch {
+            throw TMDBError.networkError(error)
+        }
+    }
 }
 
 // MARK: - Error Handling
