@@ -140,8 +140,10 @@ struct MediaDetailView: View {
         .sheet(isPresented: $showingAddToCollection) {
             AddToCollectionView(searchResult: searchResult)
         }
+        
+#endif
     }
-#endif    
+
     @ViewBuilder
     private var loadingView: some View {
         VStack {
