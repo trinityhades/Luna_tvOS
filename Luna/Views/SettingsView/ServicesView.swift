@@ -12,7 +12,7 @@ struct ServicesView: View {
     @StateObject private var serviceManager = ServiceManager.shared
     @Environment(\.editMode) private var editMode
     @State private var showDownloadAlert = false
-    @State private var downloadURL = "https://git.luna-app.eu/50n50/sources/raw/branch/main/checkmate/checkmate.json"
+    @State private var downloadURL = ""
     @State private var showServiceDownloadAlert = false
     
     var body: some View {
@@ -77,7 +77,7 @@ struct ServicesView: View {
             .alert("Add Service", isPresented: $showDownloadAlert) {
                 TextField("JSON URL", text: $downloadURL)
                 Button("Cancel", role: .cancel) {
-                    downloadURL = "https://git.luna-app.eu/50n50/sources/raw/branch/main/checkmate/checkmate.json"
+                    downloadURL = ""
                 }
                 Button("Add") {
                     downloadServiceFromURL()
