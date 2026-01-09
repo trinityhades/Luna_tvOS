@@ -115,6 +115,9 @@
 		13F5B5922E73090000565E75 /* HomeSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13F5B5912E73090000565E75 /* HomeSection.swift */; };
 		13F5B5952E730CB200565E75 /* TMDBContentFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13F5B5942E730CB200565E75 /* TMDBContentFilter.swift */; };
 		13F5B5972E730CDB00565E75 /* TMDBFiltersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13F5B5962E730CDB00565E75 /* TMDBFiltersView.swift */; };
+		373B79FA2F10C1DD009A6D3D /* Shows-tvOS-Details.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373B79F92F10C1DD009A6D3D /* Shows-tvOS-Details.swift */; };
+		373B79FC2F10C1F0009A6D3D /* MoonPhaseLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373B79FB2F10C1F0009A6D3D /* MoonPhaseLoader.swift */; };
+		373B79FE2F10C279009A6D3D /* TVOSBackButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373B79FD2F10C279009A6D3D /* TVOSBackButton.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -240,6 +243,9 @@
 		13F5B5912E73090000565E75 /* HomeSection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeSection.swift; sourceTree = "<group>"; };
 		13F5B5942E730CB200565E75 /* TMDBContentFilter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TMDBContentFilter.swift; sourceTree = "<group>"; };
 		13F5B5962E730CDB00565E75 /* TMDBFiltersView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TMDBFiltersView.swift; sourceTree = "<group>"; };
+		373B79F92F10C1DD009A6D3D /* Shows-tvOS-Details.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Shows-tvOS-Details.swift"; sourceTree = "<group>"; };
+		373B79FB2F10C1F0009A6D3D /* MoonPhaseLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoonPhaseLoader.swift; sourceTree = "<group>"; };
+		373B79FD2F10C279009A6D3D /* TVOSBackButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TVOSBackButton.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -604,6 +610,7 @@
 			children = (
 				13F072832E4B2D9000EF90EB /* Movie-Details.swift */,
 				13F072842E4B2D9000EF90EB /* Shows-Details.swift */,
+				373B79F92F10C1DD009A6D3D /* Shows-tvOS-Details.swift */,
 				13F072852E4B2D9000EF90EB /* DetailRow.swift */,
 			);
 			path = Details;
@@ -617,6 +624,8 @@
 				13F0728D2E4B2D9100EF90EB /* UIImage */,
 				13F072912E4B2D9100EF90EB /* Color */,
 				136D3E5B2EB75D7E0094210C /* LiquidGlassBackground.swift */,
+				373B79FB2F10C1F0009A6D3D /* MoonPhaseLoader.swift */,
+				373B79FD2F10C279009A6D3D /* TVOSBackButton.swift */,
 				12E7AF5F2EB80771003B7664 /* Platform.swift */,
 			);
 			path = Extensions;
@@ -859,6 +868,7 @@
 				12E7AF602EB80775003B7664 /* Platform.swift in Sources */,
 				129CC90C2EBA920C00D2D84B /* Bundle.swift in Sources */,
 				13DCC4F62E58B40F0028AE91 /* HybridSimilarity.swift in Sources */,
+				373B79FE2F10C279009A6D3D /* TVOSBackButton.swift in Sources */,
 				13E1EDE92ED9E66000087629 /* customSlider.swift in Sources */,
 				13E1EDE42ED9E66000087629 /* pagedViewController.swift in Sources */,
 				13F072A32E4B2D9200EF90EB /* SearchView.swift in Sources */,
@@ -892,6 +902,7 @@
 				13F072A62E4B2D9200EF90EB /* LibraryView.swift in Sources */,
 				13F072A92E4B2D9200EF90EB /* LoggerView.swift in Sources */,
 				13F072A72E4B2D9200EF90EB /* MediaDetailView.swift in Sources */,
+				373B79FA2F10C1DD009A6D3D /* Shows-tvOS-Details.swift in Sources */,
 				13F072A22E4B2D9200EF90EB /* SettingsView.swift in Sources */,
 				13E1EDE02ED9E66000087629 /* KanzenRunnerController.swift in Sources */,
 				13E1EDEC2ED9E66000087629 /* circularLoading.swift in Sources */,
@@ -920,6 +931,7 @@
 				13F187AE2E6F38CE00747F7E /* LibraryCollection.swift in Sources */,
 				13830AF02E55C04F00B3CDE4 /* AlgorithmSelectionView.swift in Sources */,
 				13F0729E2E4B2D9200EF90EB /* JSController-Details.swift in Sources */,
+				373B79FC2F10C1F0009A6D3D /* MoonPhaseLoader.swift in Sources */,
 				13F187AF2E6F38CE00747F7E /* AddToCollectionView.swift in Sources */,
 				13E1EDD12ED9E65F00087629 /* Module.swift in Sources */,
 				13830AEE2E55BEDD00B3CDE4 /* JaroWinklerSimilarity.swift in Sources */,
