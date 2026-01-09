@@ -433,7 +433,7 @@ struct TVOSDetailsSection: View {
         } label: {
             Image(systemName: "plus")
                 .font(.title2)
-                .fontWeight(.bold)
+                .modifier(FontWeightModifier())
                 .frame(width: 66, height: 66)
                 .background(
                     RoundedRectangle(cornerRadius: 16, style: .continuous)
@@ -742,7 +742,7 @@ struct TVOSDetailsSection: View {
                         .font(.caption)
                         .foregroundColor(.white.opacity(0.6))
                         .textCase(.uppercase)
-                        .tracking(0.5)
+                        .modifier(TrackingModifier(value: 0.5))
                     HStack(spacing: 4) {
                         Text(String(format: "%.1f", tvShow.voteAverage))
                             .font(.body.weight(.semibold))
@@ -795,7 +795,7 @@ struct TVOSDetailsSection: View {
                         .font(.caption)
                         .foregroundColor(.white.opacity(0.6))
                         .textCase(.uppercase)
-                        .tracking(0.5)
+                        .modifier(TrackingModifier(value: 0.5))
                     HStack(spacing: 4) {
                         Text(String(format: "%.1f", movie.voteAverage))
                             .font(.body.weight(.semibold))
@@ -1263,7 +1263,7 @@ struct TVDetailInfoRow: View {
                 .font(.caption)
                 .foregroundColor(.white.opacity(0.6))
                 .textCase(.uppercase)
-                .tracking(0.5)
+                .modifier(TrackingModifier(value: 0.5))
 
             Text(value)
                 .font(.body)
@@ -1323,5 +1323,29 @@ struct CastBubble: View {
             .animation(.easeOut(duration: 0.12), value: isFocused)
         }
         .buttonStyle(CardButtonStyle())
+    }
+}
+
+// MARK: - Compatibility View Modifiers
+
+struct FontWeightModifier: ViewModifier {
+    func body(content: Content) -> some View {
+        if #available(iOS 16.0, tvOS 16.0, *) {
+            content.fontWeight(.bold)
+        } else {
+            content.font(.system(.body).weight(.bold))
+        }
+    }
+}
+
+struct TrackingModifier: ViewModifier {
+    let value: CGFloat
+    
+    func body(content: Content) -> some View {
+        if #available(iOS 16.0, tvOS 16.0, *) {
+            content.tracking(value)
+        } else {
+            content // No tracking/kerning support on older versions
+        }
     }
 }
