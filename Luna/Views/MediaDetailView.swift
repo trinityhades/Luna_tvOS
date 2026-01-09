@@ -70,6 +70,33 @@ struct MediaDetailView: View {
     }
     
     var body: some View {
+#if os(tvOS)
+        Group {
+            if isLoading {
+                loadingView
+            } else if let errorMessage = errorMessage {
+                errorView(errorMessage)
+            } else {
+                TVOSDetailsSection(
+                    tvShow: tvShowDetail,
+                    movie: movieDetail,
+                    selectedSeason: $selectedSeason,
+                    seasonDetail: $seasonDetail,
+                    selectedEpisodeForSearch: $selectedEpisodeForSearch,
+                    tmdbService: tmdbService
+                )
+            }
+        }
+        .navigationBarHidden(true)
+        .tvOSBackButton()
+        .onAppear {
+            loadMediaDetails()
+            updateBookmarkStatus()
+        }
+        .onChangeComp(of: libraryManager.collections) { _, _ in
+            updateBookmarkStatus()
+        }
+#else
         ZStack {
             Group {
                 ambientColor
@@ -83,12 +110,9 @@ struct MediaDetailView: View {
             } else {
                 mainScrollView
             }
-#if !os(tvOS)
             navigationOverlay
-#endif
         }
         .navigationBarHidden(true)
-#if !os(tvOS)
         .gesture(
             DragGesture()
                 .onEnded { value in
@@ -97,11 +121,6 @@ struct MediaDetailView: View {
                     }
                 }
         )
-#else
-        .onExitCommand {
-            presentationMode.wrappedValue.dismiss()
-        }
-#endif
         .onAppear {
             loadMediaDetails()
             updateBookmarkStatus()
@@ -122,7 +141,7 @@ struct MediaDetailView: View {
             AddToCollectionView(searchResult: searchResult)
         }
     }
-    
+#endif    
     @ViewBuilder
     private var loadingView: some View {
         VStack {
