@@ -1,5 +1,5 @@
 //
-//  ShowsDetails.swift
+//  Shows-tvOS-Details.swift
 //  Luna
 //
 //  Created by TrinityHades on 08/01/26.
