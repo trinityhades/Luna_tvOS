@@ -8,6 +8,7 @@
 import UIKit
 import SwiftUI
 import AVFoundation
+import MediaPlayer
 
 final class PlayerViewController: UIViewController {
     private let videoContainer: UIView = {
@@ -201,6 +202,15 @@ final class PlayerViewController: UIViewController {
     private var isSeeking = false
     private var cachedDuration: Double = 0
     private var cachedPosition: Double = 0
+    private var currentMediaTitle: String?
+    private var currentMediaArtwork: UIImage?
+
+    private struct RemoteCommandTarget {
+        let command: MPRemoteCommand
+        let token: Any
+    }
+    private var remoteCommandCenter: MPRemoteCommandCenter?
+    private var remoteCommandTargets: [RemoteCommandTarget] = []
     private var pipController: PiPController?
     private var initialURL: URL?
     private var initialPreset: PlayerPreset?
@@ -319,6 +329,8 @@ final class PlayerViewController: UIViewController {
         
         pipController = PiPController(sampleBufferDisplayLayer: displayLayer)
         pipController?.delegate = self
+
+        configureRemoteCommandsIfNeeded()
         
         showControlsTemporarily()
         
@@ -382,6 +394,10 @@ final class PlayerViewController: UIViewController {
             pipController?.stopPictureInPicture()
         }
         pipController?.invalidate()
+
+        teardownRemoteCommandsIfNeeded()
+        clearNowPlayingInfo()
+
         renderer.stop()
         displayLayer.removeFromSuperlayer()
         NotificationCenter.default.removeObserver(self)
@@ -393,6 +409,99 @@ final class PlayerViewController: UIViewController {
         self.initialPreset = preset
         self.initialHeaders = headers
         self.initialSubtitles = subtitles
+    }
+    
+    func setMediaMetadata(title: String?, artwork: UIImage?) {
+        self.currentMediaTitle = title
+        self.currentMediaArtwork = artwork
+        updateNowPlayingInfo()
+    }
+
+    private func configureRemoteCommandsIfNeeded() {
+#if os(tvOS)
+        // Register transport controls so iOS Control Center / Lock Screen remote controls can
+        // control playback when the user selects the Apple TV as their Now Playing target.
+        let commandCenter = MPRemoteCommandCenter.shared()
+        remoteCommandCenter = commandCenter
+
+        func addTarget(_ command: MPRemoteCommand, handler: @escaping (MPRemoteCommandEvent) -> MPRemoteCommandHandlerStatus) {
+            let token = command.addTarget(handler: handler)
+            remoteCommandTargets.append(.init(command: command, token: token))
+        }
+
+        commandCenter.playCommand.isEnabled = true
+        addTarget(commandCenter.playCommand) { [weak self] _ in
+            guard let self else { return .commandFailed }
+            self.renderer.play()
+            self.updateNowPlayingInfo()
+            return .success
+        }
+
+        commandCenter.pauseCommand.isEnabled = true
+        addTarget(commandCenter.pauseCommand) { [weak self] _ in
+            guard let self else { return .commandFailed }
+            self.renderer.pausePlayback()
+            self.updateNowPlayingInfo()
+            return .success
+        }
+
+        commandCenter.togglePlayPauseCommand.isEnabled = true
+        addTarget(commandCenter.togglePlayPauseCommand) { [weak self] _ in
+            guard let self else { return .commandFailed }
+            if self.renderer.isPausedState {
+                self.renderer.play()
+            } else {
+                self.renderer.pausePlayback()
+            }
+            self.updateNowPlayingInfo()
+            return .success
+        }
+
+        commandCenter.changePlaybackPositionCommand.isEnabled = true
+        addTarget(commandCenter.changePlaybackPositionCommand) { [weak self] event in
+            guard let self, let event = event as? MPChangePlaybackPositionCommandEvent else {
+                return .commandFailed
+            }
+            self.renderer.seek(to: event.positionTime)
+            self.updateNowPlayingInfo()
+            return .success
+        }
+
+        commandCenter.skipForwardCommand.isEnabled = true
+        commandCenter.skipForwardCommand.preferredIntervals = [15]
+        addTarget(commandCenter.skipForwardCommand) { [weak self] _ in
+            guard let self else { return .commandFailed }
+            self.renderer.seek(to: max(0, self.cachedPosition + 15))
+            self.updateNowPlayingInfo()
+            return .success
+        }
+
+        commandCenter.skipBackwardCommand.isEnabled = true
+        commandCenter.skipBackwardCommand.preferredIntervals = [15]
+        addTarget(commandCenter.skipBackwardCommand) { [weak self] _ in
+            guard let self else { return .commandFailed }
+            self.renderer.seek(to: max(0, self.cachedPosition - 15))
+            self.updateNowPlayingInfo()
+            return .success
+        }
+
+        // Disable irrelevant commands for video playback.
+        commandCenter.nextTrackCommand.isEnabled = false
+        commandCenter.previousTrackCommand.isEnabled = false
+        commandCenter.likeCommand.isEnabled = false
+        commandCenter.dislikeCommand.isEnabled = false
+        commandCenter.bookmarkCommand.isEnabled = false
+#endif
+    }
+
+    private func teardownRemoteCommandsIfNeeded() {
+#if os(tvOS)
+        for target in remoteCommandTargets {
+            target.command.removeTarget(target.token)
+        }
+        remoteCommandTargets.removeAll()
+        remoteCommandCenter = nil
+#endif
     }
     
     func load(url: URL, preset: PlayerPreset, headers: [String: String]? = nil) {
@@ -426,7 +535,7 @@ final class PlayerViewController: UIViewController {
                 progress = ProgressManager.shared.getEpisodeProgress(showId: showId, seasonNumber: seasonNumber, episodeNumber: episodeNumber)
             }
             
-            if progress < 0.95 {
+            if progress < ProgressManager.watchedProgressThreshold {
                 pendingSeekTime = lastPlayedTime
             }
         }
@@ -1059,13 +1168,57 @@ final class PlayerViewController: UIViewController {
             }
         }
     }
+
+    private func finalizeProgressBeforeExit() {
+        guard let info = mediaInfo else { return }
+        guard cachedDuration.isFinite, cachedDuration > 0 else { return }
+        guard cachedPosition.isFinite, cachedPosition >= 0 else { return }
+
+        let clampedPosition = min(cachedPosition, cachedDuration)
+        let progress = clampedPosition / cachedDuration
+
+        if progress >= ProgressManager.watchedProgressThreshold {
+            switch info {
+            case .movie(let id, let title):
+                ProgressManager.shared.markMovieAsWatched(movieId: id, title: title)
+            case .episode(let showId, let seasonNumber, let episodeNumber):
+                ProgressManager.shared.markEpisodeAsWatched(
+                    showId: showId,
+                    seasonNumber: seasonNumber,
+                    episodeNumber: episodeNumber
+                )
+            }
+        } else {
+            switch info {
+            case .movie(let id, let title):
+                ProgressManager.shared.updateMovieProgress(
+                    movieId: id,
+                    title: title,
+                    currentTime: clampedPosition,
+                    totalDuration: cachedDuration
+                )
+            case .episode(let showId, let seasonNumber, let episodeNumber):
+                ProgressManager.shared.updateEpisodeProgress(
+                    showId: showId,
+                    seasonNumber: seasonNumber,
+                    episodeNumber: episodeNumber,
+                    currentTime: clampedPosition,
+                    totalDuration: cachedDuration
+                )
+            }
+        }
+    }
     
     @objc private func closeTapped() {
         pipController?.delegate = nil
         if pipController?.isPictureInPictureActive == true {
             pipController?.stopPictureInPicture()
         }
+
+        finalizeProgressBeforeExit()
         
+        teardownRemoteCommandsIfNeeded()
+        clearNowPlayingInfo()
         renderer.stop()
         
         if presentingViewController != nil {
@@ -1097,6 +1250,9 @@ final class PlayerViewController: UIViewController {
             if self.pipController?.isPictureInPictureActive == true {
                 self.pipController?.updatePlaybackState()
             }
+            
+            // Update Now Playing info for TV app integration
+            self.updateNowPlayingInfo()
         }
         
         guard duration.isFinite, duration > 0, position >= 0, let info = mediaInfo else { return }
@@ -1121,6 +1277,75 @@ final class PlayerViewController: UIViewController {
             return String(format: "%02d:%02d", m, s)
         }
     }
+    
+    // MARK: - Apple TV App Integration
+    private func updateNowPlayingInfo() {
+        var nowPlayingInfo = [String: Any]()
+        
+        // Set media title
+        if let title = currentMediaTitle {
+            nowPlayingInfo[MPMediaItemPropertyTitle] = title
+        } else if let mediaInfo = mediaInfo {
+            switch mediaInfo {
+            case .movie(_, let title):
+                nowPlayingInfo[MPMediaItemPropertyTitle] = title
+            case .episode(let showId, let seasonNumber, let episodeNumber):
+                nowPlayingInfo[MPMediaItemPropertyTitle] = "S\(seasonNumber)E\(episodeNumber)"
+            }
+        }
+        
+        // Set playback info
+        if cachedDuration > 0 {
+            nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = cachedDuration
+        }
+        nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = cachedPosition
+        nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = renderer.isPausedState ? 0.0 : renderer.getSpeed()
+        nowPlayingInfo[MPNowPlayingInfoPropertyDefaultPlaybackRate] = 1.0
+        if cachedDuration.isFinite, cachedDuration > 0, cachedPosition.isFinite {
+            nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackProgress] = max(0, min(1, cachedPosition / cachedDuration))
+        }
+        
+        // Set media type
+        if let mediaInfo = mediaInfo {
+            switch mediaInfo {
+            case .movie:
+                nowPlayingInfo[MPNowPlayingInfoPropertyMediaType] = MPNowPlayingInfoMediaType.video.rawValue
+            case .episode:
+                nowPlayingInfo[MPNowPlayingInfoPropertyMediaType] = MPNowPlayingInfoMediaType.video.rawValue
+            }
+        }
+        
+        // Set artwork if available
+        if let artwork = currentMediaArtwork {
+            nowPlayingInfo[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(boundsSize: artwork.size) { _ in
+                return artwork
+            }
+        }
+
+        // Provide a stable opaque identifier for system surfaces.
+        if let mediaInfo = mediaInfo {
+            switch mediaInfo {
+            case .movie(let id, _):
+                nowPlayingInfo[MPNowPlayingInfoPropertyExternalContentIdentifier] = "tmdb:movie:\(id)"
+            case .episode(let showId, let seasonNumber, let episodeNumber):
+                nowPlayingInfo[MPNowPlayingInfoPropertyExternalContentIdentifier] = "tmdb:tv:\(showId):s\(seasonNumber)e\(episodeNumber)"
+            }
+        }
+        
+        // Update Now Playing Info Center
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
+
+        if #available(tvOS 13.0, iOS 13.0, *) {
+            MPNowPlayingInfoCenter.default().playbackState = renderer.isPausedState ? .paused : .playing
+        }
+    }
+    
+    private func clearNowPlayingInfo() {
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
+        if #available(tvOS 13.0, iOS 13.0, *) {
+            MPNowPlayingInfoCenter.default().playbackState = .stopped
+        }
+    }
 }
 
 // MARK: - MPVSoftwareRendererDelegate
@@ -1132,6 +1357,7 @@ extension PlayerViewController: MPVSoftwareRendererDelegate {
     func renderer(_ renderer: MPVSoftwareRenderer, didChangePause isPaused: Bool) {
         updatePlayPauseButton(isPaused: isPaused)
         pipController?.updatePlaybackState()
+        updateNowPlayingInfo()
     }
     
     func renderer(_ renderer: MPVSoftwareRenderer, didChangeLoading isLoading: Bool) {

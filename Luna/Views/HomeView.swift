@@ -25,6 +25,7 @@ struct HomeView: View {
     @State private var isHoveringWatchlist = false
     
     @State private var hasLoadedContent = false
+    @State private var continueWatchingItems: [WatchHistoryItem] = []
     
     @AppStorage("homeSections") private var homeSectionsData: Data = {
         if let data = try? JSONEncoder().encode(HomeSection.defaultSections) {
@@ -84,6 +85,8 @@ struct HomeView: View {
             if !hasLoadedContent {
                 loadContent()
             }
+            // Always reload continue watching when returning to home
+            loadContinueWatching()
         }
         .onChangeComp(of: contentFilter.filterHorror) { _, _ in
             if hasLoadedContent {
@@ -98,7 +101,8 @@ struct HomeView: View {
     @ViewBuilder
     private var loadingView: some View {
         VStack(spacing: 16) {
-            MoonPhaseLoader(iconSize: 30, spacing: 14, stepDuration: 0.3)
+            MoonPhaseCoreAnimationLoader(iconSize: 30, spacing: 14, stepDuration: 0.3, isAnimating: true)
+                .frame(height: 60)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
@@ -300,6 +304,11 @@ struct HomeView: View {
     @ViewBuilder
     private var contentSections: some View {
         VStack(spacing: 0) {
+            // Continue Watching Section
+            if !continueWatchingItems.isEmpty {
+                ContinueWatchingSection(items: continueWatchingItems)
+            }
+            
             ForEach(homeSections.filter { $0.isEnabled }) { section in
                 switch section.id {
                 case "trending":
@@ -365,19 +374,19 @@ struct HomeView: View {
     private func loadContent() {
         isLoading = true
         errorMessage = nil
-        
-        Task {
+
+        Task.detached(priority: .userInitiated) {
             do {
-                async let trending = tmdbService.getTrending()
-                async let popularM = tmdbService.getPopularMovies()
-                async let popularTV = tmdbService.getPopularTVShows()
-                async let popularA = tmdbService.getPopularAnime()
-                async let topRatedM = tmdbService.getTopRatedMovies()
-                async let topRatedTV = tmdbService.getTopRatedTVShows()
-                async let topRatedA = tmdbService.getTopRatedAnime()
-                
+                async let trending = TMDBService.shared.getTrending()
+                async let popularM = TMDBService.shared.getPopularMovies()
+                async let popularTV = TMDBService.shared.getPopularTVShows()
+                async let popularA = TMDBService.shared.getPopularAnime()
+                async let topRatedM = TMDBService.shared.getTopRatedMovies()
+                async let topRatedTV = TMDBService.shared.getTopRatedTVShows()
+                async let topRatedA = TMDBService.shared.getTopRatedAnime()
+
                 let (trendingResult, popularMoviesResult, popularTVResult, popularAnimeResult, topRatedMoviesResult, topRatedTVResult, topRatedAnimeResult) = try await (trending, popularM, popularTV, popularA, topRatedM, topRatedTV, topRatedA)
-                
+
                 await MainActor.run {
                     withAnimation(.easeInOut(duration: 0.5)) {
                         self.trendingContent = contentFilter.filterSearchResults(trendingResult)
@@ -387,7 +396,7 @@ struct HomeView: View {
                         self.topRatedMovies = contentFilter.filterMovies(topRatedMoviesResult)
                         self.topRatedTVShows = contentFilter.filterTVShows(topRatedTVResult)
                         self.topRatedAnime = contentFilter.filterTVShows(topRatedAnimeResult)
-                        
+
                         self.heroContent = self.trendingContent.first { $0.backdropPath != nil } ?? self.trendingContent.first
                         self.isLoading = false
                         self.hasLoadedContent = true
@@ -401,6 +410,61 @@ struct HomeView: View {
                 }
             }
         }
+    }
+    
+    private func loadContinueWatching() {
+        let moviesInProgress = ProgressManager.shared.getMoviesInProgress()
+        let episodesInProgress = ProgressManager.shared.getEpisodesInProgress()
+        
+        Logger.shared.log("Loading Continue Watching: \(moviesInProgress.count) movies, \(episodesInProgress.count) episodes in progress", type: "Progress")
+        
+        var allItems: [WatchHistoryItem] = []
+        allItems.append(contentsOf: moviesInProgress.map { WatchHistoryItem(from: $0) })
+        allItems.append(contentsOf: episodesInProgress.map { WatchHistoryItem(from: $0) })
+        
+        // Filter out invalid or non-finite progress entries and clamp
+        let validItems = allItems.compactMap { item -> WatchHistoryItem? in
+            guard item.progress.isFinite,
+                  item.currentTime.isFinite,
+                  item.totalDuration.isFinite,
+                  item.totalDuration > 0 else { return nil }
+            let clampedProgress = max(0, min(item.progress, 1))
+            return WatchHistoryItem(
+                id: item.id,
+                type: item.type,
+                tmdbId: item.tmdbId,
+                title: item.title,
+                posterURL: item.posterURL,
+                backdropURL: item.backdropURL,
+                progress: clampedProgress,
+                currentTime: min(max(0, item.currentTime), item.totalDuration),
+                totalDuration: item.totalDuration,
+                isWatched: item.isWatched,
+                lastUpdated: item.lastUpdated,
+                showId: item.showId,
+                seasonNumber: item.seasonNumber,
+                episodeNumber: item.episodeNumber,
+                episodeTitle: item.episodeTitle
+            )
+        }
+        
+        // Deduplicate by id, keeping the most recently updated
+        var unique: [String: WatchHistoryItem] = [:]
+        for item in validItems {
+            if let existing = unique[item.id] {
+                if item.lastUpdated > existing.lastUpdated { unique[item.id] = item }
+            } else {
+                unique[item.id] = item
+            }
+        }
+        
+        let deduped = Array(unique.values)
+            .sorted { $0.lastUpdated > $1.lastUpdated }
+            .prefix(20)
+            .map { $0 }
+        
+        continueWatchingItems = deduped
+        Logger.shared.log("Displaying \(continueWatchingItems.count) continue watching items", type: "Progress")
     }
 }
 
@@ -536,6 +600,264 @@ struct MediaCard: View {
         }, else: { view in
             view.buttonStyle(PlainButtonStyle())
         })
+    }
+}
+
+struct ContinueWatchingSection: View {
+    let items: [WatchHistoryItem]
+    
+    var gap: Double { isTvOS ? 50.0 : 20.0 }
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                Text("Continue Watching")
+                    .font(isTvOS ? .headline : .title2)
+                    .fontWeight(.bold)
+                    .foregroundColor(.white)
+                Spacer()
+            }
+            .padding(.horizontal, isTvOS ? 40 : 16)
+            
+            ScrollView(.horizontal, showsIndicators: false) {
+                LazyHStack(spacing: gap) {
+                    ForEach(items) { item in
+                        ContinueWatchingCard(item: item)
+                    }
+                }
+                .padding(.horizontal, isTvOS ? 40 : 16)
+            }
+#if os(tvOS)
+            .focusSection()
+#endif
+            .modifier(ScrollClipModifier())
+            .buttonStyle(.borderless)
+        }
+        .padding(.top, isTvOS ? 40 : 24)
+    }
+}
+
+struct ContinueWatchingCard: View {
+    let item: WatchHistoryItem
+    @State private var searchResult: TMDBSearchResult?
+    @State private var episode: TMDBEpisode?
+    @FocusState private var isFocused: Bool
+
+    private var fallbackSearchResult: TMDBSearchResult {
+        switch item.type {
+        case .movie:
+            return TMDBSearchResult(
+                id: item.tmdbId,
+                mediaType: "movie",
+                title: item.title,
+                name: nil,
+                overview: nil,
+                posterPath: nil,
+                backdropPath: nil,
+                releaseDate: nil,
+                firstAirDate: nil,
+                voteAverage: 0,
+                popularity: 0,
+                adult: nil,
+                genreIds: []
+            )
+        case .episode:
+            let showId = item.showId ?? item.tmdbId
+            return TMDBSearchResult(
+                id: showId,
+                mediaType: "tv",
+                title: nil,
+                name: item.title,
+                overview: nil,
+                posterPath: nil,
+                backdropPath: nil,
+                releaseDate: nil,
+                firstAirDate: nil,
+                voteAverage: 0,
+                popularity: 0,
+                adult: nil,
+                genreIds: []
+            )
+        }
+    }
+
+    private var destinationResult: TMDBSearchResult {
+        searchResult ?? fallbackSearchResult
+    }
+    
+    var body: some View {
+        NavigationLink(destination: MediaDetailView(searchResult: destinationResult)) {
+            cardContent
+        }
+        .onAppear {
+            if searchResult == nil {
+                loadMediaDetails()
+            }
+        }
+        .tvos({ view in
+            view
+                .buttonStyle(CardButtonStyle())
+                .focused($isFocused)
+                .scaleEffect(isFocused ? 1.03 : 1.0)
+                .animation(.easeOut(duration: 0.12), value: isFocused)
+        }, else: { view in
+            view.buttonStyle(PlainButtonStyle())
+        })
+    }
+    
+    @ViewBuilder
+    private var cardContent: some View {
+        let safeProgress = item.progress.isFinite ? max(0, min(item.progress, 1)) : 0
+
+        VStack(alignment: .leading, spacing: 10) {
+                // Episode thumbnail
+                ZStack(alignment: .bottomLeading) {
+                    KFImage(URL(string: searchResult?.fullPosterURL ?? ""))
+                        .placeholder {
+                            Rectangle()
+                                .fill(Color.white.opacity(0.1))
+                                .overlay(
+                                    Image(systemName: item.type == .movie ? "film" : "tv")
+                                        .font(.title)
+                                        .foregroundColor(.white.opacity(0.3))
+                                )
+                        }
+                        .resizable()
+                        .aspectRatio(16 / 9, contentMode: .fill)
+                        .tvos({ view in
+                            view.frame(height: 180)
+                        }, else: { view in
+                            view.frame(height: 120)
+                        })
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+
+                    // Progress bar overlay
+                        if safeProgress > 0 && safeProgress < ProgressManager.watchedProgressThreshold {
+                        VStack {
+                            Spacer()
+                            GeometryReader { geo in
+                                Rectangle()
+                                    .fill(Color.white.opacity(0.3))
+                                    .frame(height: 4)
+                                    .overlay(
+                                        Rectangle()
+                                            .fill(Color.accentColor)
+                                            .frame(
+                                                width: geo.size.width * safeProgress,
+                                                height: 4
+                                            ),
+                                        alignment: .leading
+                                    )
+                            }
+                            .frame(height: 4)
+                        }
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                    }
+                }
+
+                VStack(alignment: .leading, spacing: 6) {
+                    // Show name and episode info
+                    HStack {
+                        if let season = item.seasonNumber, let episodeNum = item.episodeNumber {
+                            Text("S\(season)E\(episodeNum)")
+                                .font(.caption)
+                                .foregroundColor(.white.opacity(0.6))
+                        } else {
+                            Text(item.type == .movie ? "Movie" : "TV Show")
+                                .font(.caption)
+                                .foregroundColor(.white.opacity(0.6))
+                        }
+
+                        Spacer()
+
+                        Text("\(Int(safeProgress * 100))%")
+                            .font(.caption2)
+                            .foregroundColor(.white.opacity(0.5))
+                    }
+
+                    Text(searchResult?.displayTitle ?? item.title)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundColor(.white)
+                        .lineLimit(2)
+
+                    if let episodeName = episode?.name, !episodeName.isEmpty {
+                        Text(episodeName)
+                            .font(.caption2)
+                            .foregroundColor(.white.opacity(0.6))
+                            .lineLimit(2)
+                    }
+                }
+        }
+        .tvos({ view in
+            view
+                .frame(width: 320)
+                .padding(14)
+                .background(Color.white.opacity(isFocused ? 0.15 : 0.05))
+                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .strokeBorder(
+                            isFocused ? Color.white.opacity(0.4) : Color.clear,
+                            lineWidth: 2
+                        )
+                )
+        }, else: { view in
+            view
+                .frame(width: 280)
+                .padding(12)
+                .background(Color.white.opacity(0.05))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+        })
+    }
+    
+    private func loadMediaDetails() {
+        Task {
+            do {
+                if item.type == .movie {
+                    let movie = try await TMDBService.shared.getMovieDetails(id: item.tmdbId)
+                    await MainActor.run {
+                        searchResult = movie.asSearchResult
+                    }
+                } else if let showId = item.showId, let seasonNum = item.seasonNumber, let episodeNum = item.episodeNumber {
+                    // Fetch TV show details first, then season details
+                    let showData = try await TMDBService.shared.getTVShowDetails(id: showId)
+                    let season = try await TMDBService.shared.getSeasonDetails(tvShowId: showId, seasonNumber: seasonNum)
+                    
+                    if let ep = season.episodes.first(where: { $0.episodeNumber == episodeNum }) {
+                        await MainActor.run {
+                            episode = ep
+                        }
+                        // Create a new search result with episode-specific data
+                        let baseResult = showData.asSearchResult
+                        let episodeResult = TMDBSearchResult(
+                            id: baseResult.id,
+                            mediaType: baseResult.mediaType,
+                            title: baseResult.title,
+                            name: baseResult.name,
+                            overview: baseResult.overview,
+                            posterPath: ep.stillPath ?? baseResult.posterPath,
+                            backdropPath: baseResult.backdropPath,
+                            releaseDate: baseResult.releaseDate,
+                            firstAirDate: baseResult.firstAirDate,
+                            voteAverage: baseResult.voteAverage,
+                            popularity: baseResult.popularity,
+                            adult: baseResult.adult,
+                            genreIds: baseResult.genreIds
+                        )
+                        
+                        await MainActor.run {
+                            searchResult = episodeResult
+                        }
+                    } else {
+                        await MainActor.run {
+                            searchResult = showData.asSearchResult
+                        }
+                    }
+                }
+            } catch {
+                Logger.shared.log("Failed to load media details for continue watching: \(error)", type: "Error")
+            }
+        }
     }
 }
 

@@ -1,18 +1,11 @@
-//
-//  CloudStore.swift
-//  Luna
-//
-//  Created by Dominic on 07.11.25.
-//
-
-import SwiftUI
+import Foundation
 import CoreData
+import SwiftUI
 
-public final class ServiceStore {
-    public static let shared = ServiceStore()
-    public static let criticalErrorNotification = Notification.Name("ServiceStoreCriticalError")
-
-    // MARK: private - internal setup and update functions
+public final class ProgressStore {
+    public static let shared = ProgressStore()
+    public static let criticalErrorNotification = Notification.Name("ProgressStoreCriticalError")
+    static let remoteChangeNotification = Notification.Name("ProgressStoreRemoteChange")
 
     private var container: NSPersistentContainer? = nil
     private var initializationFailed = false
@@ -20,6 +13,8 @@ public final class ServiceStore {
 
     private var lastStoreURL: URL? = nil
     private var lastLoadError: String? = nil
+
+    private var remoteChangeObserver: NSObjectProtocol? = nil
 
     private let storeLoadGroup = DispatchGroup()
     private var didEnterStoreLoadGroup = false
@@ -40,7 +35,7 @@ public final class ServiceStore {
             return
         }
 
-        container = NSPersistentCloudKitContainer(name: "ServiceModels")
+        container = NSPersistentCloudKitContainer(name: "ProgressModels")
 
         guard let description = container?.persistentStoreDescriptions.first else {
             Logger.shared.log("Missing store description", type: "CloudKit")
@@ -61,7 +56,7 @@ public final class ServiceStore {
 
     private func initLocal() {
         Logger.shared.log("Using Local Storage", type: "CloudKit")
-        container = NSPersistentContainer(name: "ServiceModels")
+        container = NSPersistentContainer(name: "ProgressModels")
 
         if let description = container?.persistentStoreDescriptions.first {
             configureStoreDescription(description)
@@ -82,7 +77,7 @@ public final class ServiceStore {
 
         description.url = storeURL
         lastStoreURL = storeURL
-        Logger.shared.log("ServiceModels store URL: \(storeURL.path)", type: "CloudKit")
+        Logger.shared.log("ProgressModels store URL: \(storeURL.path)", type: "CloudKit")
     }
 
     // MARK: - Debug helpers
@@ -142,8 +137,8 @@ public final class ServiceStore {
         }
 
         return base
-            .appendingPathComponent("ServiceModels", isDirectory: true)
-            .appendingPathComponent("ServiceModels.sqlite", isDirectory: false)
+            .appendingPathComponent("ProgressModels", isDirectory: true)
+            .appendingPathComponent("ProgressModels.sqlite", isDirectory: false)
     }
 
     @discardableResult
@@ -188,15 +183,14 @@ public final class ServiceStore {
     }
 
     private func loadPersistentStores() {
-
         if didEnterStoreLoadGroup == false {
             didEnterStoreLoadGroup = true
             storeLoadGroup.enter()
         }
 
         guard let description = container?.persistentStoreDescriptions.first else {
-            self.initializationFailed = true
-            self.notifyUserOfCriticalError("Failed to access store description")
+            initializationFailed = true
+            notifyUserOfCriticalError("Failed to access store description")
             finishStoreLoadIfNeeded()
             return
         }
@@ -225,6 +219,17 @@ public final class ServiceStore {
                 self.lastLoadError = nil
                 self.container?.viewContext.automaticallyMergesChangesFromParent = true
                 self.container?.viewContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+
+                if self.remoteChangeObserver == nil, let coordinator = self.container?.persistentStoreCoordinator {
+                    self.remoteChangeObserver = NotificationCenter.default.addObserver(
+                        forName: .NSPersistentStoreRemoteChange,
+                        object: coordinator,
+                        queue: nil
+                    ) { _ in
+                        NotificationCenter.default.post(name: ProgressStore.remoteChangeNotification, object: nil)
+                    }
+                }
+
                 self.finishStoreLoadIfNeeded()
             }
         }
@@ -247,19 +252,17 @@ public final class ServiceStore {
     private func notifyUserOfCriticalError(_ message: String) {
         DispatchQueue.main.async {
             NotificationCenter.default.post(
-                name: ServiceStore.criticalErrorNotification,
+                name: ProgressStore.criticalErrorNotification,
                 object: nil,
                 userInfo: ["error": message]
             )
         }
     }
 
-    // MARK: public - status, add, get, remove, save, syncManually functions
-
     public enum StorageStatus {
-        case ready             // container initialized and loaded
-        case unavailable       // container not initialized -> local only
-        case unknown           // initialization failed
+        case ready
+        case unavailable
+        case unknown
     }
 
     public func status() -> StorageStatus {
@@ -272,213 +275,112 @@ public final class ServiceStore {
         }
     }
 
-    public func storeService(id: UUID, url: String, jsonMetadata: String, jsScript: String, isActive: Bool) {
+    func getProgressData() -> ProgressData {
         waitForStoreIfNeeded()
-        guard let container = container else {
-            Logger.shared.log("Container not initialized: storeService", type: "CloudKit")
+        guard let container else {
+            Logger.shared.log("Container not initialized: getProgressData", type: "CloudKit")
+            return ProgressData()
+        }
+
+        var movies: [MovieProgressEntry] = []
+        var episodes: [EpisodeProgressEntry] = []
+
+        container.viewContext.performAndWait {
+            do {
+                let movieRequest: NSFetchRequest<MovieProgressEntity> = MovieProgressEntity.fetchRequest()
+                movies = try container.viewContext.fetch(movieRequest).map { $0.asModel }
+            } catch {
+                Logger.shared.log("Fetch movie progress failed: \(error.localizedDescription)", type: "CloudKit")
+            }
+
+            do {
+                let episodeRequest: NSFetchRequest<EpisodeProgressEntity> = EpisodeProgressEntity.fetchRequest()
+                episodes = try container.viewContext.fetch(episodeRequest).map { $0.asModel }
+            } catch {
+                Logger.shared.log("Fetch episode progress failed: \(error.localizedDescription)", type: "CloudKit")
+            }
+        }
+
+        return ProgressData(movieProgress: movies, episodeProgress: episodes)
+    }
+
+    func counts() -> (movies: Int, episodes: Int) {
+        waitForStoreIfNeeded()
+        guard let container else { return (0, 0) }
+
+        var movieCount = 0
+        var episodeCount = 0
+
+        container.viewContext.performAndWait {
+            do {
+                movieCount = try container.viewContext.count(for: MovieProgressEntity.fetchRequest())
+            } catch { }
+            do {
+                episodeCount = try container.viewContext.count(for: EpisodeProgressEntity.fetchRequest())
+            } catch { }
+        }
+
+        return (movieCount, episodeCount)
+    }
+
+    func upsertMovie(_ entry: MovieProgressEntry) {
+        waitForStoreIfNeeded()
+        guard let container else {
+            Logger.shared.log("Container not initialized: upsertMovie", type: "CloudKit")
             return
         }
 
         container.viewContext.performAndWait {
-            let context = container.viewContext
-
-            // Check if a service with the same ID already exists
-            let fetchRequest: NSFetchRequest<ServiceEntity> = ServiceEntity.fetchRequest()
-            fetchRequest.predicate = NSPredicate(format: "id == %@", id as CVarArg)
-            fetchRequest.fetchLimit = 1
-
-            do {
-                let results = try context.fetch(fetchRequest)
-                let service: ServiceEntity
-
-                if let existing = results.first {
-                    // Update existing service
-                    service = existing
-                } else {
-                    // Create new service
-                    service = ServiceEntity(context: context)
-                    service.id = id
-
-                    // Assign proper sort index so new services go to the bottom
-                    let countRequest: NSFetchRequest<ServiceEntity> = ServiceEntity.fetchRequest()
-                    countRequest.includesSubentities = false
-                    let count = try context.count(for: countRequest)
-
-                    service.sortIndex = Int64(count)
-                }
-
-                service.url = url
-                service.jsonMetadata = jsonMetadata
-                service.jsScript = jsScript
-                service.isActive = isActive
-
-                do {
-                    if context.hasChanges {
-                        try context.save()
-                    }
-                } catch {
-                    Logger.shared.log("Save failed: \(error.localizedDescription)", type: "CloudKit")
-                }
-            } catch {
-                Logger.shared.log("Failed to fetch existing service: \(error.localizedDescription)", type: "CloudKit")
-            }
-        }
-    }
-
-    public func getEntities() -> [ServiceEntity] {
-        waitForStoreIfNeeded()
-        guard let container = container else {
-            Logger.shared.log("Container not initialized: getEntities", type: "CloudKit")
-            return []
-        }
-
-        var result: [ServiceEntity] = []
-
-        container.viewContext.performAndWait {
-            do {
-                let request: NSFetchRequest<ServiceEntity> = ServiceEntity.fetchRequest()
-                let sort = NSSortDescriptor(key: "sortIndex", ascending: true)
-                request.sortDescriptors = [sort]
-                result = try container.viewContext.fetch(request)
-            } catch {
-                Logger.shared.log("Fetch failed: \(error.localizedDescription)", type: "CloudKit")
-            }
-        }
-
-        return result
-    }
-
-    public func getServices() -> [Service] {
-        waitForStoreIfNeeded()
-        guard let container = container else {
-            Logger.shared.log("Container not initialized: getServices", type: "CloudKit")
-            return []
-        }
-
-        var result: [Service] = []
-
-        container.viewContext.performAndWait {
-            do {
-                let request: NSFetchRequest<ServiceEntity> = ServiceEntity.fetchRequest()
-                let sort = NSSortDescriptor(key: "sortIndex", ascending: true)
-                request.sortDescriptors = [sort]
-                let entities = try container.viewContext.fetch(request)
-                Logger.shared.log("Loaded \(entities.count) ServiceEntities", type: "CloudKit")
-                result = entities.compactMap { $0.asModel }
-            } catch {
-                Logger.shared.log("Fetch failed: \(error.localizedDescription)", type: "CloudKit")
-            }
-        }
-
-        return result
-    }
-
-    public func updateService(id: UUID, updates: (ServiceEntity) -> Void) {
-        waitForStoreIfNeeded()
-        guard let container = container else {
-            Logger.shared.log("Container not initialized: updateService", type: "CloudKit")
-            return
-        }
-
-        container.viewContext.performAndWait {
-            let request: NSFetchRequest<ServiceEntity> = ServiceEntity.fetchRequest()
-            request.predicate = NSPredicate(format: "id == %@", id as CVarArg)
+            let request: NSFetchRequest<MovieProgressEntity> = MovieProgressEntity.fetchRequest()
+            request.predicate = NSPredicate(format: "id == %lld", Int64(entry.id))
             request.fetchLimit = 1
 
             do {
-                if let entity = try container.viewContext.fetch(request).first {
-                    updates(entity)  // Apply the updates via closure
+                let entity = try container.viewContext.fetch(request).first ?? MovieProgressEntity(context: container.viewContext)
+                entity.apply(from: entry)
 
-                    if container.viewContext.hasChanges {
-                        try container.viewContext.save()
-                    }
-                } else {
-                    Logger.shared.log("ServiceEntity not found for id: \(id)", type: "CloudKit")
-                }
-            } catch {
-                Logger.shared.log("Failed to update service: \(error.localizedDescription)", type: "CloudKit")
-            }
-        }
-    }
-
-    public func updateMultipleServices(updates: [(id: UUID, update: (ServiceEntity) -> Void)]) {
-        waitForStoreIfNeeded()
-        guard let container = container else {
-            Logger.shared.log("Container not initialized: updateMultipleServices", type: "CloudKit")
-            return
-        }
-
-        container.viewContext.performAndWait {
-            for (id, updateClosure) in updates {
-                let request: NSFetchRequest<ServiceEntity> = ServiceEntity.fetchRequest()
-                request.predicate = NSPredicate(format: "id == %@", id as CVarArg)
-                request.fetchLimit = 1
-
-                do {
-                    if let entity = try container.viewContext.fetch(request).first {
-                        updateClosure(entity)
-                    }
-                } catch {
-                    Logger.shared.log("Failed to fetch service \(id): \(error.localizedDescription)", type: "CloudKit")
-                }
-            }
-
-            do {
                 if container.viewContext.hasChanges {
                     try container.viewContext.save()
                 }
             } catch {
-                Logger.shared.log("Failed to save batch updates: \(error.localizedDescription)", type: "CloudKit")
+                Logger.shared.log("Upsert movie progress failed: \(error.localizedDescription)", type: "CloudKit")
             }
         }
     }
 
-    public func remove(_ service: Service) {
+    func upsertEpisode(_ entry: EpisodeProgressEntry) {
         waitForStoreIfNeeded()
-        guard let container = container else {
-            Logger.shared.log("Container not initialized: remove", type: "CloudKit")
+        guard let container else {
+            Logger.shared.log("Container not initialized: upsertEpisode", type: "CloudKit")
             return
         }
 
         container.viewContext.performAndWait {
-            let request: NSFetchRequest<ServiceEntity> = ServiceEntity.fetchRequest()
-            request.predicate = NSPredicate(format: "id == %@", service.id as CVarArg)
-            do {
-                if let entity = try container.viewContext.fetch(request).first {
-                    container.viewContext.delete(entity)
-                    if container.viewContext.hasChanges {
-                        try container.viewContext.save()
-                    }
-                } else {
-                    Logger.shared.log("ServiceEntity not found for id: \(service.id)", type: "CloudKit")
-                }
-            } catch {
-                Logger.shared.log("Failed to fetch ServiceEntity to delete: \(error.localizedDescription)", type: "CloudKit")
-            }
-        }
-    }
+            let request: NSFetchRequest<EpisodeProgressEntity> = EpisodeProgressEntity.fetchRequest()
+            request.predicate = NSPredicate(
+                format: "showId == %lld AND seasonNumber == %lld AND episodeNumber == %lld",
+                Int64(entry.showId),
+                Int64(entry.seasonNumber),
+                Int64(entry.episodeNumber)
+            )
+            request.fetchLimit = 1
 
-    public func save() {
-        waitForStoreIfNeeded()
-        guard let container = container else {
-            Logger.shared.log("Container not initialized: save", type: "CloudKit")
-            return
-        }
-
-        container.viewContext.performAndWait {
             do {
+                let entity = try container.viewContext.fetch(request).first ?? EpisodeProgressEntity(context: container.viewContext)
+                entity.apply(from: entry)
+
                 if container.viewContext.hasChanges {
                     try container.viewContext.save()
                 }
             } catch {
-                Logger.shared.log("Save failed: \(error.localizedDescription)", type: "CloudKit")
+                Logger.shared.log("Upsert episode progress failed: \(error.localizedDescription)", type: "CloudKit")
             }
         }
     }
 
-    public func syncManually() async {
+    func syncManually() async {
         waitForStoreIfNeeded()
-        guard let container = container else {
+        guard let container else {
             Logger.shared.log("Container not initialized: syncManually", type: "CloudKit")
             return
         }
@@ -486,7 +388,7 @@ public final class ServiceStore {
         do {
             try await container.viewContext.perform {
                 try container.viewContext.save()
-                let _ = ServiceStore.shared.getServices()
+                let _ = self.getProgressData()
             }
         } catch {
             Logger.shared.log("Sync failed: \(error.localizedDescription)", type: "CloudKit")
@@ -494,7 +396,7 @@ public final class ServiceStore {
     }
 }
 
-extension ServiceStore.StorageStatus {
+extension ProgressStore.StorageStatus {
     var description: String {
         switch self {
         case .ready:

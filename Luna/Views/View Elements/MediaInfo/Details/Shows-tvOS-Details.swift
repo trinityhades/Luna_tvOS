@@ -28,6 +28,7 @@ struct TVOSDetailsSection: View {
     @State private var showingAddToCollection = false
     @State private var romajiTitle: String?
     @State private var isBookmarked: Bool = false
+    @State private var watchedChangeCounter: Int = 0
     @FocusState private var focusedEpisode: Int?
     @FocusState private var focusedSeason: Int?
     @FocusState private var focusedButton: DetailButtonFocus?
@@ -104,7 +105,6 @@ struct TVOSDetailsSection: View {
         guard let seasonDetail, !seasonDetail.episodes.isEmpty else { return nil }
 
         var bestEpisode: TMDBEpisode?
-        var bestProgress: Double = 0
 
         for episode in seasonDetail.episodes {
             let progress = ProgressManager.shared.getEpisodeProgress(
@@ -113,10 +113,12 @@ struct TVOSDetailsSection: View {
                 episodeNumber: episode.episodeNumber
             )
 
-            guard progress > 0.02, progress < 0.95 else { continue }
-
-            if progress > bestProgress {
-                bestProgress = progress
+            guard progress > 0.00, progress < ProgressManager.watchedProgressThreshold else { continue }
+            if let currentBest = bestEpisode {
+                if (episode.seasonNumber, episode.episodeNumber) > (currentBest.seasonNumber, currentBest.episodeNumber) {
+                    bestEpisode = episode
+                }
+            } else {
                 bestEpisode = episode
             }
         }
@@ -197,7 +199,7 @@ struct TVOSDetailsSection: View {
         }
         .background(Color.black)
         .onAppear(perform: handleOnAppear)
-        .sheet(isPresented: $showingSearchResults) {
+        .fullScreenCover(isPresented: $showingSearchResults) {
             ModulesSearchResultsSheet(
                 mediaTitle: tvShow?.name ?? movie?.title ?? "Unknown",
                 originalTitle: romajiTitle,
@@ -948,12 +950,18 @@ struct TVOSDetailsSection: View {
     }
 
     private func episodeCard(tvShow: TMDBTVShowWithSeasons, episode: TMDBEpisode) -> some View {
+        let _ = watchedChangeCounter
         let progress = ProgressManager.shared
             .getEpisodeProgress(
                 showId: tvShow.id,
                 seasonNumber: episode.seasonNumber,
                 episodeNumber: episode.episodeNumber
             )
+        let isWatched = ProgressManager.shared.isEpisodeWatched(
+            showId: tvShow.id,
+            seasonNumber: episode.seasonNumber,
+            episodeNumber: episode.episodeNumber
+        )
         let isSelected =
             selectedEpisodeForSearch?.id == episode.id
 
@@ -980,7 +988,7 @@ struct TVOSDetailsSection: View {
                         .clipShape(RoundedRectangle(cornerRadius: 12))
 
                     // Progress bar overlay
-                    if progress > 0 && progress < 0.95 {
+                    if progress > 0 && progress < ProgressManager.watchedProgressThreshold {
                         VStack {
                             Spacer()
                             GeometryReader { geo in
@@ -1000,6 +1008,17 @@ struct TVOSDetailsSection: View {
                             .frame(height: 4)
                         }
                         .clipShape(RoundedRectangle(cornerRadius: 12))
+                    }
+                }
+                .overlay(alignment: .topTrailing) {
+                    if isWatched {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.title3)
+                            .foregroundColor(.white)
+                            .padding(10)
+                            .background(Color.black.opacity(0.45))
+                            .clipShape(Circle())
+                            .padding(8)
                     }
                 }
 
@@ -1050,6 +1069,17 @@ struct TVOSDetailsSection: View {
             )
         }
         .buttonStyle(CardButtonStyle())
+        .simultaneousGesture(
+            LongPressGesture(minimumDuration: 0.65)
+                .onEnded { _ in
+                    ProgressManager.shared.markEpisodeAsWatched(
+                        showId: tvShow.id,
+                        seasonNumber: episode.seasonNumber,
+                        episodeNumber: episode.episodeNumber
+                    )
+                    watchedChangeCounter += 1
+                }
+        )
         .focused($focusedEpisode, equals: episode.episodeNumber)
         .scaleEffect(focusedEpisode == episode.episodeNumber ? 1.03 : 1.0)
         .animation(.easeOut(duration: 0.12), value: focusedEpisode == episode.episodeNumber)

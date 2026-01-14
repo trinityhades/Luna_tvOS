@@ -28,6 +28,7 @@ struct MediaDetailView: View {
     @State private var showingAddToCollection = false
     @State private var selectedEpisodeForSearch: TMDBEpisode?
     @State private var romajiTitle: String?
+    @State private var currentUserActivity: NSUserActivity?
     
     @StateObject private var serviceManager = ServiceManager.shared
     @ObservedObject private var libraryManager = LibraryManager.shared
@@ -122,19 +123,35 @@ struct MediaDetailView: View {
         .onAppear {
             loadMediaDetails()
             updateBookmarkStatus()
+            setupUserActivity()
+        }
+        .onDisappear {
+            invalidateUserActivity()
         }
         .onChangeComp(of: libraryManager.collections) { _, _ in
             updateBookmarkStatus()
         }
-        .sheet(isPresented: $showingSearchResults) {
-            ModulesSearchResultsSheet(
-                mediaTitle: searchResult.displayTitle,
-                originalTitle: romajiTitle,
-                isMovie: searchResult.isMovie,
-                selectedEpisode: selectedEpisodeForSearch,
-                tmdbId: searchResult.id
-            )
-        }
+        .tvos({ view in
+            view.fullScreenCover(isPresented: $showingSearchResults) {
+                ModulesSearchResultsSheet(
+                    mediaTitle: searchResult.displayTitle,
+                    originalTitle: romajiTitle,
+                    isMovie: searchResult.isMovie,
+                    selectedEpisode: selectedEpisodeForSearch,
+                    tmdbId: searchResult.id
+                )
+            }
+        }, else: { view in
+            view.sheet(isPresented: $showingSearchResults) {
+                ModulesSearchResultsSheet(
+                    mediaTitle: searchResult.displayTitle,
+                    originalTitle: romajiTitle,
+                    isMovie: searchResult.isMovie,
+                    selectedEpisode: selectedEpisodeForSearch,
+                    tmdbId: searchResult.id
+                )
+            }
+        })
         .sheet(isPresented: $showingAddToCollection) {
             AddToCollectionView(searchResult: searchResult)
         }
@@ -446,6 +463,60 @@ struct MediaDetailView: View {
                     self.errorMessage = error.localizedDescription
                     self.isLoading = false
                 }
+            }
+        }
+    }
+    
+    // MARK: - Apple TV App Integration
+    private func setupUserActivity() {
+        let activity = NSUserActivity(activityType: "com.luna.details")
+        
+        // Set external media content identifier for TV app integration
+        // This allows Siri to add content to Up Next
+        let contentId = generateContentIdentifier()
+        activity.externalMediaContentIdentifier = contentId
+        
+        // Set user-friendly title
+        activity.title = searchResult.displayTitle
+        
+        // Enable for search and handoff
+        activity.isEligibleForSearch = true
+        activity.isEligibleForHandoff = true
+        
+        // Add user info for deep linking
+        var userInfo: [String: Any] = [
+            "tmdbId": searchResult.id,
+            "mediaType": searchResult.isMovie ? "movie" : "tv"
+        ]
+        
+        if !searchResult.isMovie, let episode = selectedEpisodeForSearch {
+            userInfo["seasonNumber"] = episode.seasonNumber
+            userInfo["episodeNumber"] = episode.episodeNumber
+        }
+        
+        activity.userInfo = userInfo
+        
+        // Make it current
+        activity.becomeCurrent()
+        
+        // Store strong reference
+        currentUserActivity = activity
+    }
+    
+    private func invalidateUserActivity() {
+        currentUserActivity?.invalidate()
+        currentUserActivity = nil
+    }
+    
+    private func generateContentIdentifier() -> String {
+        // Generate unique identifier for the content
+        if searchResult.isMovie {
+            return "movie_\(searchResult.id)"
+        } else {
+            if let episode = selectedEpisodeForSearch {
+                return "tv_\(searchResult.id)_s\(episode.seasonNumber)_e\(episode.episodeNumber)"
+            } else {
+                return "tv_\(searchResult.id)"
             }
         }
     }

@@ -9,6 +9,7 @@ import SwiftUI
 
 @main
 struct SoraApp: App {
+    @StateObject private var deepLinkHandler = DeepLinkHandler.shared
 
 #if !os(tvOS)
     @StateObject private var settings = Settings()
@@ -25,11 +26,31 @@ struct SoraApp: App {
                     .environmentObject(settings)
                     .environmentObject(moduleManager)
                     .environmentObject(favouriteManager)
+                    .environmentObject(deepLinkHandler)
                     .accentColor(settings.accentColor)
                     .storageErrorOverlay()
+                    .onOpenURL { url in
+                        deepLinkHandler.handle(url: url)
+                    }
+                    .onContinueUserActivity(NSUserActivityTypeBrowsingWeb) { userActivity in
+                        deepLinkHandler.handleUserActivity(userActivity)
+                    }
+                    .onContinueUserActivity("com.luna.details") { userActivity in
+                        deepLinkHandler.handleUserActivity(userActivity)
+                    }
             } else {
                 ContentView()
+                    .environmentObject(deepLinkHandler)
                     .storageErrorOverlay()
+                    .onOpenURL { url in
+                        deepLinkHandler.handle(url: url)
+                    }
+                    .onContinueUserActivity(NSUserActivityTypeBrowsingWeb) { userActivity in
+                        deepLinkHandler.handleUserActivity(userActivity)
+                    }
+                    .onContinueUserActivity("com.luna.details") { userActivity in
+                        deepLinkHandler.handleUserActivity(userActivity)
+                    }
             }
         }
     }
@@ -37,7 +58,17 @@ struct SoraApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(deepLinkHandler)
                 .storageErrorOverlay()
+                .onOpenURL { url in
+                    deepLinkHandler.handle(url: url)
+                }
+                .onContinueUserActivity(NSUserActivityTypeBrowsingWeb) { userActivity in
+                    deepLinkHandler.handleUserActivity(userActivity)
+                }
+                .onContinueUserActivity("com.luna.details") { userActivity in
+                    deepLinkHandler.handleUserActivity(userActivity)
+                }
         }
     }
 #endif

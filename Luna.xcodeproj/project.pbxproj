@@ -3,10 +3,13 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A1B2C3D4E5F60718293A4B60 /* ProgressStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B5C /* ProgressStore.swift */; };
+		A1B2C3D4E5F60718293A4B61 /* ProgressEntities.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B5D /* ProgressEntities.swift */; };
+		A1B2C3D4E5F60718293A4B62 /* ProgressModels.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B5E /* ProgressModels.xcdatamodeld */; };
 		12201F512EBE918D0033073C /* ServiceStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12201F502EBE91870033073C /* ServiceStore.swift */; };
 		12201F542EBE922D0033073C /* ServiceModels.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 12201F522EBE922D0033073C /* ServiceModels.xcdatamodeld */; };
 		129A8FB52F095BED00B77C95 /* LanguageSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 129A8FB42F095BE500B77C95 /* LanguageSelectionView.swift */; };
@@ -116,10 +119,32 @@
 		13F5B5922E73090000565E75 /* HomeSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13F5B5912E73090000565E75 /* HomeSection.swift */; };
 		13F5B5952E730CB200565E75 /* TMDBContentFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13F5B5942E730CB200565E75 /* TMDBContentFilter.swift */; };
 		13F5B5972E730CDB00565E75 /* TMDBFiltersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13F5B5962E730CDB00565E75 /* TMDBFiltersView.swift */; };
-		3761DF722F10CE7700F865CB /* MoonPhaseLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3761DF712F10CE7700F865CB /* MoonPhaseLoader.swift */; };
-		3761DF742F10CEE900F865CB /* TVOSBackButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3761DF732F10CEE900F865CB /* TVOSBackButton.swift */; };
-		768618092F1091FD00E975AF /* Shows-tvOS-Details.swift in Sources */ = {isa = PBXBuildFile; fileRef = 768618082F1091FC00E975AF /* Shows-tvOS-Details.swift */; };
+		76710FF72F11DFC10061B452 /* SubtitleM3U8Generator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76710FF62F11DFC10061B452 /* SubtitleM3U8Generator.swift */; };
+		76710FF92F11DFC70061B452 /* HLSManifestInterceptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76710FF82F11DFC70061B452 /* HLSManifestInterceptor.swift */; };
+		76710FFB2F11DFF00061B452 /* Shows-tvOS-Details.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76710FFA2F11DFF00061B452 /* Shows-tvOS-Details.swift */; };
+		76710FFD2F11E05D0061B452 /* MoonPhaseLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76710FFC2F11E05D0061B452 /* MoonPhaseLoader.swift */; };
+		76710FFF2F11E0670061B452 /* TVOSBackButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76710FFE2F11E0670061B452 /* TVOSBackButton.swift */; };
+		767110012F11F45D0061B452 /* SubtitleOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 767110002F11F45D0061B452 /* SubtitleOverlayView.swift */; };
+		768E969D2F14679600DED96B /* DeepLinkHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 768E969C2F14679600DED96B /* DeepLinkHandler.swift */; };
+		768E96AC2F1484B300DED96B /* LunaTopShelf2.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 768E96A22F1484B200DED96B /* LunaTopShelf2.appex */; platformFilters = (tvos, ); settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		768E96BD2F14861700DED96B /* ContentProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 768E96B72F14861700DED96B /* ContentProvider.swift */; };
+		768E96BE2F14861700DED96B /* ServiceProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 768E96BA2F14861700DED96B /* ServiceProvider.swift */; };
+		768E96CB2F148D8E00DED96B /* TVServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 768E96C92F148D8600DED96B /* TVServices.framework */; };
+		768E96CC2F148D8E00DED96B /* TVServices.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 768E96C92F148D8600DED96B /* TVServices.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		76E6F12B2F16164400CF8C09 /* CoreAnimationSpinner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76E6F12A2F16164400CF8C09 /* CoreAnimationSpinner.swift */; };
+		76E6F12D2F16178900CF8C09 /* MoonPhaseCoreAnimationLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76E6F12C2F16178900CF8C09 /* MoonPhaseCoreAnimationLoader.swift */; };
+		9F0A1B2C3D4E5F60718293A7 /* TopShelfStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F0A1B2C3D4E5F60718293A5 /* TopShelfStore.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		768E96AA2F1484B300DED96B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 13F072532E4B2D3300EF90EB /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 768E96A12F1484B200DED96B;
+			remoteInfo = LunaTopShelf;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		12F745372EB539F000889684 /* Embed Frameworks */ = {
@@ -132,9 +157,34 @@
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		768E96B12F1484B300DED96B /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				768E96AC2F1484B300DED96B /* LunaTopShelf2.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		768E96CD2F148D8E00DED96B /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				768E96CC2F148D8E00DED96B /* TVServices.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		A1B2C3D4E5F60718293A4B5C /* ProgressStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressStore.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F60718293A4B5D /* ProgressEntities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressEntities.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F60718293A4B5F /* ProgressModels.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = ProgressModels.xcdatamodel; sourceTree = "<group>"; };
 		12201F502EBE91870033073C /* ServiceStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceStore.swift; sourceTree = "<group>"; };
 		12201F532EBE922D0033073C /* ServiceModels.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = ServiceModels.xcdatamodel; sourceTree = "<group>"; };
 		1240112B2EFF3B8B00CEC6EB /* Luna.local.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Luna.local.entitlements; sourceTree = "<group>"; };
@@ -245,10 +295,37 @@
 		13F5B5912E73090000565E75 /* HomeSection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeSection.swift; sourceTree = "<group>"; };
 		13F5B5942E730CB200565E75 /* TMDBContentFilter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TMDBContentFilter.swift; sourceTree = "<group>"; };
 		13F5B5962E730CDB00565E75 /* TMDBFiltersView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TMDBFiltersView.swift; sourceTree = "<group>"; };
-		3761DF712F10CE7700F865CB /* MoonPhaseLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoonPhaseLoader.swift; sourceTree = "<group>"; };
-		3761DF732F10CEE900F865CB /* TVOSBackButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TVOSBackButton.swift; sourceTree = "<group>"; };
-		768618082F1091FC00E975AF /* Shows-tvOS-Details.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Shows-tvOS-Details.swift"; sourceTree = "<group>"; };
+		76710FF62F11DFC10061B452 /* SubtitleM3U8Generator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubtitleM3U8Generator.swift; sourceTree = "<group>"; };
+		76710FF82F11DFC70061B452 /* HLSManifestInterceptor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HLSManifestInterceptor.swift; sourceTree = "<group>"; };
+		76710FFA2F11DFF00061B452 /* Shows-tvOS-Details.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Shows-tvOS-Details.swift"; sourceTree = "<group>"; };
+		76710FFC2F11E05D0061B452 /* MoonPhaseLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoonPhaseLoader.swift; sourceTree = "<group>"; };
+		76710FFE2F11E0670061B452 /* TVOSBackButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TVOSBackButton.swift; sourceTree = "<group>"; };
+		767110002F11F45D0061B452 /* SubtitleOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubtitleOverlayView.swift; sourceTree = "<group>"; };
+		768E969C2F14679600DED96B /* DeepLinkHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepLinkHandler.swift; sourceTree = "<group>"; };
+		768E96A22F1484B200DED96B /* LunaTopShelf2.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = LunaTopShelf2.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		768E96B72F14861700DED96B /* ContentProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentProvider.swift; sourceTree = "<group>"; };
+		768E96B82F14861700DED96B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		768E96B92F14861700DED96B /* LunaTopShelf.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LunaTopShelf.entitlements; sourceTree = "<group>"; };
+		768E96BA2F14861700DED96B /* ServiceProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceProvider.swift; sourceTree = "<group>"; };
+		768E96C92F148D8600DED96B /* TVServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = TVServices.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS26.2.sdk/System/Library/Frameworks/TVServices.framework; sourceTree = DEVELOPER_DIR; };
+		76E6F12A2F16164400CF8C09 /* CoreAnimationSpinner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreAnimationSpinner.swift; sourceTree = "<group>"; };
+		76E6F12C2F16178900CF8C09 /* MoonPhaseCoreAnimationLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoonPhaseCoreAnimationLoader.swift; sourceTree = "<group>"; };
+		9F0A1B2C3D4E5F60718293A5 /* TopShelfStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopShelfStore.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		768E96AD2F1484B300DED96B /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 768E96A12F1484B200DED96B /* LunaTopShelf2 */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		768E96A62F1484B300DED96B /* LunaTopShelf */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (768E96AD2F1484B300DED96B /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = LunaTopShelf; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		13F072582E4B2D3300EF90EB /* Frameworks */ = {
@@ -263,6 +340,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		768E969F2F1484B200DED96B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				768E96CB2F148D8E00DED96B /* TVServices.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -274,7 +359,10 @@
 				1324E7BA2E940BD70036B5F5 /* PiPController.swift */,
 				13F315AF2EAD03F70025BD7A /* SubtitleLoader.swift */,
 				1324E7B52E940BD70036B5F5 /* PlayerViewController.swift */,
+				76710FF62F11DFC10061B452 /* SubtitleM3U8Generator.swift */,
 				1324E7B42E940BD70036B5F5 /* MPVSoftwareRenderer.swift */,
+				767110002F11F45D0061B452 /* SubtitleOverlayView.swift */,
+				76710FF82F11DFC70061B452 /* HLSManifestInterceptor.swift */,
 				1324E7B62E940BD70036B5F5 /* SampleBufferDisplayView.swift */,
 			);
 			path = Player;
@@ -300,6 +388,9 @@
 			isa = PBXGroup;
 			children = (
 				13B6F3442EA4C6BC00DECD2B /* ProgressManager.swift */,
+				A1B2C3D4E5F60718293A4B5C /* ProgressStore.swift */,
+				A1B2C3D4E5F60718293A4B5D /* ProgressEntities.swift */,
+				A1B2C3D4E5F60718293A4B5E /* ProgressModels.xcdatamodeld */,
 			);
 			path = Progress;
 			sourceTree = "<group>";
@@ -520,6 +611,8 @@
 				129CC9062EBA1D4600D2D84B /* Build.xcconfig */,
 				129CC9082EBA1F8400D2D84B /* Build.local.xcconfig */,
 				13E1EDF22ED9E67000087629 /* ContentModel.xcdatamodeld */,
+				768E96A62F1484B300DED96B /* LunaTopShelf */,
+				768E96A32F1484B300DED96B /* Frameworks */,
 				13F0725C2E4B2D3300EF90EB /* Products */,
 			);
 			sourceTree = "<group>";
@@ -528,6 +621,7 @@
 			isa = PBXGroup;
 			children = (
 				13F0725B2E4B2D3300EF90EB /* Luna.app */,
+				768E96A22F1484B200DED96B /* LunaTopShelf2.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -536,6 +630,7 @@
 			isa = PBXGroup;
 			children = (
 				13B6F3472EA4C82600DECD2B /* Info.plist */,
+				9F0A1B2C3D4E5F60718293A6 /* TopShelf */,
 				1324E7B22E940BD70036B5F5 /* Player */,
 				13F5B5902E73090000565E75 /* Models */,
 				1375466E2E5F078B00B29944 /* Tracking */,
@@ -547,6 +642,7 @@
 				13F072752E4B2D9000EF90EB /* Views */,
 				13F0725E2E4B2D3300EF90EB /* SoraApp.swift */,
 				13F0727D2E4B2D9000EF90EB /* ContentView.swift */,
+				768E96BB2F14861700DED96B /* LunaTopShelf */,
 				13F072622E4B2D3700EF90EB /* Assets.xcassets */,
 				13F072642E4B2D3700EF90EB /* Luna.entitlements */,
 				1240112B2EFF3B8B00CEC6EB /* Luna.local.entitlements */,
@@ -611,10 +707,10 @@
 		13F072822E4B2D9000EF90EB /* Details */ = {
 			isa = PBXGroup;
 			children = (
+				76710FFA2F11DFF00061B452 /* Shows-tvOS-Details.swift */,
 				13F072832E4B2D9000EF90EB /* Movie-Details.swift */,
 				13F072842E4B2D9000EF90EB /* Shows-Details.swift */,
 				13F072852E4B2D9000EF90EB /* DetailRow.swift */,
-				768618082F1091FC00E975AF /* Shows-tvOS-Details.swift */,
 			);
 			path = Details;
 			sourceTree = "<group>";
@@ -627,8 +723,11 @@
 				13F0728D2E4B2D9100EF90EB /* UIImage */,
 				13F072912E4B2D9100EF90EB /* Color */,
 				136D3E5B2EB75D7E0094210C /* LiquidGlassBackground.swift */,
-				3761DF712F10CE7700F865CB /* MoonPhaseLoader.swift */,
-				3761DF732F10CEE900F865CB /* TVOSBackButton.swift */,
+				76E6F12C2F16178900CF8C09 /* MoonPhaseCoreAnimationLoader.swift */,
+				76E6F12A2F16164400CF8C09 /* CoreAnimationSpinner.swift */,
+				768E969C2F14679600DED96B /* DeepLinkHandler.swift */,
+				76710FFC2F11E05D0061B452 /* MoonPhaseLoader.swift */,
+				76710FFE2F11E0670061B452 /* TVOSBackButton.swift */,
 				12E7AF5F2EB80771003B7664 /* Platform.swift */,
 			);
 			path = Extensions;
@@ -761,6 +860,33 @@
 			path = Library;
 			sourceTree = "<group>";
 		};
+		768E96A32F1484B300DED96B /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				768E96C92F148D8600DED96B /* TVServices.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		768E96BB2F14861700DED96B /* LunaTopShelf */ = {
+			isa = PBXGroup;
+			children = (
+				768E96B72F14861700DED96B /* ContentProvider.swift */,
+				768E96B82F14861700DED96B /* Info.plist */,
+				768E96B92F14861700DED96B /* LunaTopShelf.entitlements */,
+				768E96BA2F14861700DED96B /* ServiceProvider.swift */,
+			);
+			path = LunaTopShelf;
+			sourceTree = SOURCE_ROOT;
+		};
+		9F0A1B2C3D4E5F60718293A6 /* TopShelf */ = {
+			isa = PBXGroup;
+			children = (
+				9F0A1B2C3D4E5F60718293A5 /* TopShelfStore.swift */,
+			);
+			path = TopShelf;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -773,10 +899,12 @@
 				13F072582E4B2D3300EF90EB /* Frameworks */,
 				13F072592E4B2D3300EF90EB /* Resources */,
 				12F745372EB539F000889684 /* Embed Frameworks */,
+				768E96B12F1484B300DED96B /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				768E96AB2F1484B300DED96B /* PBXTargetDependency */,
 			);
 			name = Luna;
 			packageProductDependencies = (
@@ -790,6 +918,29 @@
 			productReference = 13F0725B2E4B2D3300EF90EB /* Luna.app */;
 			productType = "com.apple.product-type.application";
 		};
+		768E96A12F1484B200DED96B /* LunaTopShelf2 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 768E96AE2F1484B300DED96B /* Build configuration list for PBXNativeTarget "LunaTopShelf2" */;
+			buildPhases = (
+				768E969E2F1484B200DED96B /* Sources */,
+				768E969F2F1484B200DED96B /* Frameworks */,
+				768E96A02F1484B200DED96B /* Resources */,
+				768E96CD2F148D8E00DED96B /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				768E96A62F1484B300DED96B /* LunaTopShelf */,
+			);
+			name = LunaTopShelf2;
+			packageProductDependencies = (
+			);
+			productName = LunaTopShelf;
+			productReference = 768E96A22F1484B200DED96B /* LunaTopShelf2.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -797,11 +948,14 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 2600;
+				LastSwiftUpdateCheck = 2620;
 				LastUpgradeCheck = 2620;
 				TargetAttributes = {
 					13F0725A2E4B2D3300EF90EB = {
 						CreatedOnToolsVersion = 15.2;
+					};
+					768E96A12F1484B200DED96B = {
+						CreatedOnToolsVersion = 26.2;
 					};
 				};
 			};
@@ -825,6 +979,7 @@
 			projectRoot = "";
 			targets = (
 				13F0725A2E4B2D3300EF90EB /* Luna */,
+				768E96A12F1484B200DED96B /* LunaTopShelf2 */,
 			);
 		};
 /* End PBXProject section */
@@ -836,6 +991,13 @@
 			files = (
 				13F072632E4B2D3700EF90EB /* Assets.xcassets in Resources */,
 				13E1EDDA2ED9E65F00087629 /* bundle.js in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		768E96A02F1484B200DED96B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -869,23 +1031,30 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A1B2C3D4E5F60718293A4B60 /* ProgressStore.swift in Sources */,
+				A1B2C3D4E5F60718293A4B61 /* ProgressEntities.swift in Sources */,
+				A1B2C3D4E5F60718293A4B62 /* ProgressModels.xcdatamodeld in Sources */,
 				12E7AF602EB80775003B7664 /* Platform.swift in Sources */,
 				129CC90C2EBA920C00D2D84B /* Bundle.swift in Sources */,
 				13DCC4F62E58B40F0028AE91 /* HybridSimilarity.swift in Sources */,
-				3761DF722F10CE7700F865CB /* MoonPhaseLoader.swift in Sources */,
+				76710FFD2F11E05D0061B452 /* MoonPhaseLoader.swift in Sources */,
 				13E1EDE92ED9E66000087629 /* customSlider.swift in Sources */,
 				12EFED192F0727AC001A6994 /* StorageErrorToast.swift in Sources */,
 				13E1EDE42ED9E66000087629 /* pagedViewController.swift in Sources */,
+				76E6F12B2F16164400CF8C09 /* CoreAnimationSpinner.swift in Sources */,
 				13F072A32E4B2D9200EF90EB /* SearchView.swift in Sources */,
 				13830AEC2E55BD9200B3CDE4 /* AlgorithmManager.swift in Sources */,
 				13F072AD2E4B2D9200EF90EB /* DetailRow.swift in Sources */,
 				139509A22E7DDAE100CB60D4 /* PlayerSettingsView.swift in Sources */,
 				13E1EDDB2ED9E65F00087629 /* ErrorDefinitions.swift in Sources */,
 				13F072B02E4B2D9200EF90EB /* SearchResultCard.swift in Sources */,
+				76710FF92F11DFC70061B452 /* HLSManifestInterceptor.swift in Sources */,
 				136D3E5C2EB75D7E0094210C /* LiquidGlassBackground.swift in Sources */,
 				13B6F3452EA4C6BC00DECD2B /* ProgressManager.swift in Sources */,
+				9F0A1B2C3D4E5F60718293A7 /* TopShelfStore.swift in Sources */,
 				13E1EDF42ED9E67000087629 /* ContentModel.xcdatamodeld in Sources */,
 				13F072B42E4B2D9200EF90EB /* resized.swift in Sources */,
+				76710FF72F11DFC10061B452 /* SubtitleM3U8Generator.swift in Sources */,
 				13E1EDDF2ED9E66000087629 /* KanzenEngine.swift in Sources */,
 				13F5B5952E730CB200565E75 /* TMDBContentFilter.swift in Sources */,
 				13F072B12E4B2D9200EF90EB /* NormalPlayer.swift in Sources */,
@@ -902,11 +1071,10 @@
 				13E1EDE32ED9E66000087629 /* readerSettingsView.swift in Sources */,
 				13F0725F2E4B2D3300EF90EB /* SoraApp.swift in Sources */,
 				13F187AD2E6F38CE00747F7E /* LibraryItem.swift in Sources */,
-				3761DF742F10CEE900F865CB /* TVOSBackButton.swift in Sources */,
-				768618092F1091FD00E975AF /* Shows-tvOS-Details.swift in Sources */,
 				13F187B02E6F38CE00747F7E /* CreateCollectionView.swift in Sources */,
 				13F072A42E4B2D9200EF90EB /* ServicesView.swift in Sources */,
 				13F072A62E4B2D9200EF90EB /* LibraryView.swift in Sources */,
+				76710FFF2F11E0670061B452 /* TVOSBackButton.swift in Sources */,
 				13F072A92E4B2D9200EF90EB /* LoggerView.swift in Sources */,
 				13F072A72E4B2D9200EF90EB /* MediaDetailView.swift in Sources */,
 				13F072A22E4B2D9200EF90EB /* SettingsView.swift in Sources */,
@@ -915,7 +1083,10 @@
 				13E1EDEB2ED9E66000087629 /* contentCell.swift in Sources */,
 				13F072AE2E4B2D9200EF90EB /* EpisodeCell.swift in Sources */,
 				13E1EDEA2ED9E66000087629 /* favouriteViewWrapper.swift in Sources */,
+				76710FFB2F11DFF00061B452 /* Shows-tvOS-Details.swift in Sources */,
 				13E1EDD62ED9E65F00087629 /* readerManager.swift in Sources */,
+				76E6F12D2F16178900CF8C09 /* MoonPhaseCoreAnimationLoader.swift in Sources */,
+				767110012F11F45D0061B452 /* SubtitleOverlayView.swift in Sources */,
 				13E1EDDE2ED9E66000087629 /* KanzenModuleRunner.swift in Sources */,
 				13F518432EBCE42B00DEF778 /* StorageView.swift in Sources */,
 				1324E7C12E940BD70036B5F5 /* PiPController.swift in Sources */,
@@ -954,6 +1125,7 @@
 				13E1EDD92ED9E65F00087629 /* pageData.swift in Sources */,
 				1324E7BB2E940BD70036B5F5 /* PlayerPreset.swift in Sources */,
 				12DF1FC22F040D6700E80375 /* AdaptiveConfirmationDialog.swift in Sources */,
+				768E969D2F14679600DED96B /* DeepLinkHandler.swift in Sources */,
 				13F072A82E4B2D9200EF90EB /* ContentView.swift in Sources */,
 				13F072B72E4B2D9200EF90EB /* Logger.swift in Sources */,
 				13E1EDD72ED9E65F00087629 /* favouriteManager.swift in Sources */,
@@ -977,7 +1149,27 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		768E969E2F1484B200DED96B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				768E96BD2F14861700DED96B /* ContentProvider.swift in Sources */,
+				768E96BE2F14861700DED96B /* ServiceProvider.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		768E96AB2F1484B300DED96B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			platformFilters = (
+				tvos,
+			);
+			target = 768E96A12F1484B200DED96B /* LunaTopShelf2 */;
+			targetProxy = 768E96AA2F1484B300DED96B /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		13F072682E4B2D3700EF90EB /* Debug */ = {
@@ -1017,7 +1209,7 @@
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = AXLC3PQNC8;
+				DEVELOPMENT_TEAM = VW83JRZ9ZL;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -1039,6 +1231,7 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = me.cranci.sora;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -1082,7 +1275,7 @@
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = AXLC3PQNC8;
+				DEVELOPMENT_TEAM = VW83JRZ9ZL;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -1097,6 +1290,7 @@
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = me.cranci.sora;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 			};
@@ -1111,7 +1305,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = "${DEVELOPMENT_TEAM}";
+				DEVELOPMENT_TEAM = VW83JRZ9ZL;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = NO;
 				ENABLE_INCOMING_NETWORK_CONNECTIONS = NO;
@@ -1128,7 +1322,7 @@
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Luna/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "${APP_NAME}";
+				INFOPLIST_KEY_CFBundleDisplayName = LunaX;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
@@ -1144,9 +1338,9 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.6;
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.0.1;
 				OTHER_LDFLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = "${BUNDLE_IDENTIFIER}";
+				PRODUCT_BUNDLE_IDENTIFIER = me.cranci.sora;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = auto;
@@ -1168,7 +1362,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = "${DEVELOPMENT_TEAM}";
+				DEVELOPMENT_TEAM = VW83JRZ9ZL;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = NO;
 				ENABLE_INCOMING_NETWORK_CONNECTIONS = NO;
@@ -1185,7 +1379,7 @@
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Luna/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "${APP_NAME}";
+				INFOPLIST_KEY_CFBundleDisplayName = LunaX;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
@@ -1201,9 +1395,9 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.6;
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.0.1;
 				OTHER_LDFLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = "${BUNDLE_IDENTIFIER}";
+				PRODUCT_BUNDLE_IDENTIFIER = me.cranci.sora;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator";
@@ -1212,6 +1406,67 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,3";
 				TVOS_DEPLOYMENT_TARGET = 17.5;
+			};
+			name = Release;
+		};
+		768E96AF2F1484B300DED96B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = VW83JRZ9ZL;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = LunaTopShelf/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = LunaTopShelf2;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = me.cranci.sora.LunaTopShelf2;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = appletvos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 3;
+				TVOS_DEPLOYMENT_TARGET = 17.5;
+			};
+			name = Debug;
+		};
+		768E96B02F1484B300DED96B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = VW83JRZ9ZL;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = LunaTopShelf/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = LunaTopShelf2;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = me.cranci.sora.LunaTopShelf2;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = appletvos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 3;
+				TVOS_DEPLOYMENT_TARGET = 17.5;
+				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
 		};
@@ -1232,6 +1487,15 @@
 			buildConfigurations = (
 				13F0726B2E4B2D3700EF90EB /* Debug */,
 				13F0726C2E4B2D3700EF90EB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		768E96AE2F1484B300DED96B /* Build configuration list for PBXNativeTarget "LunaTopShelf2" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				768E96AF2F1484B300DED96B /* Debug */,
+				768E96B02F1484B300DED96B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1301,6 +1565,16 @@
 /* End XCSwiftPackageProductDependency section */
 
 /* Begin XCVersionGroup section */
+		A1B2C3D4E5F60718293A4B5E /* ProgressModels.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				A1B2C3D4E5F60718293A4B5F /* ProgressModels.xcdatamodel */,
+			);
+			currentVersion = A1B2C3D4E5F60718293A4B5F /* ProgressModels.xcdatamodel */;
+			path = ProgressModels.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
 		12201F522EBE922D0033073C /* ServiceModels.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
