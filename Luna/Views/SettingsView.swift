@@ -82,7 +82,7 @@ struct SettingsView: View {
                 .shadow(radius: 10)
 
             VStack(spacing: 15) {
-                Text("Version 1.0.1 - TrinityHades' Edition")
+                Text("Version \(Bundle.main.appVersion) (\(Bundle.main.buildNumber))")
                     .font(.footnote)
                     .fontWeight(.regular)
                     .foregroundColor(.secondary)
