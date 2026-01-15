@@ -102,7 +102,7 @@ final class ServiceProvider: TVTopShelfContentProvider {
         }
 
         let collection = TVTopShelfItemCollection(items: items)
-        collection.title = "DAISY IS BEAUTIFUL"
+        collection.title = "Continue Watching"
 
         let content = TVTopShelfSectionedContent(sections: [collection])
         completionHandler(content)
