@@ -2,7 +2,7 @@ import Foundation
 import TVServices
 
 private enum LunaAppGroup {
-    static let identifier = "group.me.trinityhades.luna"
+    static let identifier = "group.me.cranci.sora"
 
     static var userDefaults: UserDefaults? {
         UserDefaults(suiteName: identifier)

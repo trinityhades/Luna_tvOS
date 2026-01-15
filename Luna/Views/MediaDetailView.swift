@@ -58,9 +58,36 @@ struct MediaDetailView: View {
         return verticalSizeClass == .compact
     }
     
+    private var continueEpisode: TMDBEpisode? {
+        guard let tvShowDetail = tvShowDetail, let seasonDetail = seasonDetail, !seasonDetail.episodes.isEmpty else { return nil }
+        var bestEpisode: TMDBEpisode?
+        for episode in seasonDetail.episodes {
+            let progress = ProgressManager.shared.getEpisodeProgress(
+                showId: tvShowDetail.id,
+                seasonNumber: episode.seasonNumber,
+                episodeNumber: episode.episodeNumber
+            )
+            guard progress > 0.00, progress < ProgressManager.watchedProgressThreshold else { continue }
+            if let currentBest = bestEpisode {
+                if (episode.seasonNumber, episode.episodeNumber) > (currentBest.seasonNumber, currentBest.episodeNumber) {
+                    bestEpisode = episode
+                }
+            } else {
+                bestEpisode = episode
+            }
+        }
+        return bestEpisode
+    }
+
+    private var playTargetEpisode: TMDBEpisode? {
+        continueEpisode ?? selectedEpisodeForSearch ?? seasonDetail?.episodes.first
+    }
+
     private var playButtonText: String {
         if searchResult.isMovie {
             return "Play"
+        } else if let continueEpisode = continueEpisode {
+            return "Continue S\(continueEpisode.seasonNumber)E\(continueEpisode.episodeNumber)"
         } else if let selectedEpisode = selectedEpisodeForSearch {
             return "Play S\(selectedEpisode.seasonNumber)E\(selectedEpisode.episodeNumber)"
         } else {
@@ -414,18 +441,17 @@ struct MediaDetailView: View {
     private func searchInServices() {
         // This function will only be called when services are available
         // since the button is disabled when no services are active
-        
-        if !searchResult.isMovie {
-            if selectedEpisodeForSearch != nil {
+        if searchResult.isMovie {
+            selectedEpisodeForSearch = nil
+        } else {
+            if let continueEp = continueEpisode {
+                selectedEpisodeForSearch = continueEp
             } else if let seasonDetail = seasonDetail, !seasonDetail.episodes.isEmpty {
                 selectedEpisodeForSearch = seasonDetail.episodes.first
             } else {
                 selectedEpisodeForSearch = nil
             }
-        } else {
-            selectedEpisodeForSearch = nil
         }
-        
         showingSearchResults = true
     }
     

@@ -6,7 +6,7 @@ import TVServices
 
 enum LunaAppGroup {
     // Update this if your App Group differs.
-    static let identifier = "group.me.trinityhades.luna"
+    static let identifier = "group.me.cranci.sora"
 
     static var userDefaults: UserDefaults? {
         UserDefaults(suiteName: identifier)
